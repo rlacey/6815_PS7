@@ -7,27 +7,27 @@ def test_ComputeTensor():
   im=io.imread('pano/stata-1.png', 1.0)
   tensor=a7.computeTensor(im)
   foo=max(tensor.flatten())
-  io.imwrite(tensor/foo, 'tensor_vis.png', 1.0)
-  io.imwrite(a7.BW2(im), 'tensor_visBW.png', 1.0)
+  io.imwrite(tensor/foo, 'output/tensor_vis.png', 1.0)
+  # io.imwrite(a7.BW2(im), 'tensor_visBW.png', 1.0)
   
 def test_cornerResponse():
   im=io.imread('pano/stata-1.png', 1.0)
   resp=a7.cornerResponse(im)
   
   foo=max(resp.flatten())
-  io.imwrite(_magic123(resp/foo),'resp.png', 1.0)
+  io.imwrite(_magic123(resp/foo),'output/resp.png', 1.0)
 
 def test_HarrisCorners():
   im=io.imread('pano/stata-1.png', 1.0)
   corners=a7.HarrisCorners(im)
-  io.imwrite(_magicCorners(corners, im), 'corners.png', 1.0)
+  io.imwrite(_magicCorners(corners, im), 'output/corners.png', 1.0)
   
 
 def test_computeFeatures():
   im=io.imread('pano/stata-1.png', 1.0)
   corners=a7.HarrisCorners(im)
   features=a7.computeFeatures(im, corners)
-  io.imwrite(_magicShowFeatures(features, im*0.5, 4), 'features.png', 1.0)
+  io.imwrite(_magicShowFeatures(features, im*0.5, 4), 'output/features.png', 1.0)
 
 def test_findCorrespondence():
   im1=io.imread('pano/stata-1.png', 1.0)
@@ -166,11 +166,11 @@ def _magic123(im):
 
 #===Tests=====
 
-test_ComputeTensor()
+##test_ComputeTensor()
 ##test_cornerResponse()
 ##test_HarrisCorners()
 ##test_computeFeatures()
-##test_findCorrespondence()
+test_findCorrespondence()
 ##test_RANSAC()
 ##test_autostitch()
 ##test_autostitch2()
