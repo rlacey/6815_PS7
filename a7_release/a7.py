@@ -1,5 +1,8 @@
 import numpy as np
 import scipy
+import random
+import math
+import a6
 from scipy import ndimage, linalg
 
 class point():
@@ -119,30 +122,81 @@ def findCorrespondences(listFeatures1, listFeatures2, threshold=1.7):
   correspondences = []
   for feature1 in listFeatures1:
     best_correspondence = float("inf")
+    best_feature = None
+    best_correspondence2 = float("inf")
+    best_feature2 = None
     for feature2 in listFeatures2:
       distance = np.sum((feature1.descriptor - feature2.descriptor)**2)
-      if distance < best_correspondence:
-        best_correspondence = distance
-        correspondences.append(correspondence(feature1.pt, feature2.pt))
+      if distance < best_correspondence2:
+        best_correspondence2 = distance
+        best_feature2 = feature2
+        if distance < best_correspondence:
+          best_correspondence2 = best_correspondence
+          best_correspondence = distance
+          best_feature2 = best_feature
+          best_feature = feature2
+    if (best_correspondence2 / best_correspondence) > threshold**2:
+      correspondences.append(correspondence(feature1.pt, best_feature.pt))
   return correspondences
 
 def RANSAC(listOfCorrespondences, Niter=1000, epsilon=4, acceptableProbFailure=1e-9):
-  '''H_best: the best estimation of homorgraphy (3-by-3 matrix)'''
-  '''inliers: A list of booleans that describe whether the element in listOfCorrespondences 
-  an inlier or not'''
-  ''' 6.815 can bypass acceptableProbFailure'''
-
+  '''H_best: the best estimation of homorgraphy (3-by-3 matrix)
+     inliers: list of booleans that describe whether the element in listOfCorrespondences 
+     an inlier or not'''  
+  number_of_correspondences = len(listOfCorrespondences)
+  H_best = None
+  inliers = []
+  number_of_inliers = 0
+  for i in range(Niter):
+    feature_pairs = random.sample(listOfCorrespondences, 4)
+    homography = a6.computeHomography(A7PairsToA6Pairs(feature_pairs))
+    loop_inliers = []
+    for correspondence in listOfCorrespondences:
+      transformed_point = np.dot(homography, A7PointToA6Point(correspondence.pt1))
+      transformed_point[0] /= transformed_point[2]
+      transformed_point[1] /= transformed_point[2]
+      target_point = A7PointToA6Point(correspondence.pt2)      
+      loop_inliers.append(math.sqrt(np.sum((transformed_point - target_point)**2)) < epsilon)
+    loop_inliers_count = loop_inliers.count(True)
+    if loop_inliers_count > number_of_inliers:
+      number_of_inliers = loop_inliers_count
+      inliers = loop_inliers
+      H_best = homography
+    if ((1 - (loop_inliers_count / number_of_correspondences)**4)**i) < acceptableProbFailure:
+      break
   return (H_best, inliers)
 
-def computeNHomographies(L, refIndex, blurDescriptior=0.5, radiusDescriptor=4):
+
+def computeNHomographies(L, refIndex, blurDescriptor=0.5, radiusDescriptor=4):
   '''H_list: a list of Homorgraphy relative to L[refIndex]'''
   '''Note: len(H_list) is equal to len(L)'''
+  homographies = []
+  for i in xrange(len(L)-1):
+    features1 = computeFeatures(L[i], HarrisCorners(L[i]), blurDescriptor, radiusDescriptor)
+    features2 = computeFeatures(L[i+1], HarrisCorners(L[i+1]), blurDescriptor, radiusDescriptor)
+    correspondences = findCorrespondences(features1, features2)
+    homographies.append(RANSAC(correspondences)[0])
+  compoundHomographies = [[np.zeros([3,3])] for i in range(len(L))]
+  for i in xrange(len(L)):
+      if i < refIndex:
+          compound = np.dot(np.identity(3), homographies[i])
+          for j in xrange(i+1, refIndex+1):
+              compound = np.dot(compound, homographies[j])
+          compoundHomographies[i] = compound
+      elif i > refIndex:
+          compound = np.dot(linalg.inv(np.identity(3)), linalg.inv(homographies[i-1]))
+          for j in xrange(i-2, refIndex-1, -1): # was -1
+              compound = np.dot(compound, linalg.inv(homographies[j]))
+          compoundHomographies[i] = compound
+      else:
+          compoundHomographies[i] = np.identity(3)    
+  return compoundHomographies
 
-  return H_list
 
 def autostitch(L, refIndex, blurDescriptor=0.5, radiusDescriptor=4):
   '''Use your a6 code to stitch the images. You need to hand in your A6 code'''
-  return a6.compositeNImages(L, H_list, False)
+  H_list = computeNHomographies(L, refIndex, blurDescriptor, radiusDescriptor)
+  return a6.compositeNImages(L, H_list)
 
 def weight_map(h,w):
   ''' Given the image dimension h and w, return the hxwx3 weight map for linear blending'''

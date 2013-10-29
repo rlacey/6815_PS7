@@ -39,7 +39,7 @@ def test_findCorrespondence():
   correspondences = a7.findCorrespondences(features1, features2)
   np.save('corrs', correspondences)
   io.imwrite(_magicDrawCorrespondences(correspondences, im1, im2), \
-     'correspondence.png', 1.0)
+     'output/correspondence.png', 1.0)
 
 def test_RANSAC():
   im1=io.imread('pano/stata-1.png', 1.0)
@@ -47,13 +47,15 @@ def test_RANSAC():
   correspondences=np.load('corrs.npy')
   H, inliers =a7.RANSAC(correspondences)
   io.imwrite(_magicDrawCorrespondences(correspondences, im1, im2, inliers), \
-     'correspondence_ransac.png', 1.0)
+     'output/correspondence_ransac.png', 1.0)
+  
 def test_autostitch():
   im1=io.imread('pano/stata-1.png', 1.0)
   im2=io.imread('pano/stata-2.png', 1.0)
   im_list=[im1, im2]
   out=a7.autostitch(im_list, 0) 
-  io.imwrite(out, 'panorama.png', 1.0)
+  io.imwrite(out, 'output/panorama_goal.png', 1.0)
+  
 def test_autostitch2():
   im1=io.imread('pano/guedelon-1.png', 1.0)
   im2=io.imread('pano/guedelon-2.png', 1.0)
@@ -61,7 +63,7 @@ def test_autostitch2():
   im4=io.imread('pano/guedelon-4.png', 1.0)
   im_list=[im1, im2, im3, im4]
   out=a7.autostitch(im_list, 1) 
-  io.imwrite(out, 'panorama2.png', 1.0)
+  io.imwrite(out, 'output/panorama2_goal.png', 1.0)
 
 def test_linear_blending():
   im1=io.imread('pano/stata-1.png', 1.0)
@@ -170,10 +172,10 @@ def _magic123(im):
 ##test_cornerResponse()
 ##test_HarrisCorners()
 ##test_computeFeatures()
-test_findCorrespondence()
+##test_findCorrespondence()
 ##test_RANSAC()
-##test_autostitch()
-##test_autostitch2()
+test_autostitch()
+test_autostitch2()
 ##test_linear_blending()
 ##test_linear_blending2()
 ##test_two_scale_blending()
