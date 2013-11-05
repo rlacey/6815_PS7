@@ -194,6 +194,7 @@ def compositeNImages(listOfImages, listOfH):
         applyHomographyFast(listOfImages[i], out, np.dot(translation, listOfH[i]), True)
     return out
 
+
 def stitchN(listOfImages, listOfListOfPairs, refIndex):
     '''Takes a list of N images, a list of N-1 listOfPairs, and the index of a reference image.
     The listOfListOfPairs contains correspondences between each image Ii and image I(i+1).

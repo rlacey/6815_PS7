@@ -54,7 +54,7 @@ def test_autostitch():
   im2=io.imread('pano/stata-2.png', 1.0)
   im_list=[im1, im2]
   out=a7.autostitch(im_list, 0) 
-  io.imwrite(out, 'output/panorama_goal.png', 1.0)
+  io.imwrite(out, 'output/panorama.png', 1.0)
   
 def test_autostitch2():
   im1=io.imread('pano/guedelon-1.png', 1.0)
@@ -63,14 +63,14 @@ def test_autostitch2():
   im4=io.imread('pano/guedelon-4.png', 1.0)
   im_list=[im1, im2, im3, im4]
   out=a7.autostitch(im_list, 1) 
-  io.imwrite(out, 'output/panorama2_goal.png', 1.0)
+  io.imwrite(out, 'output/panorama2.png', 1.0)
 
 def test_linear_blending():
   im1=io.imread('pano/stata-1.png', 1.0)
   im2=io.imread('pano/stata-2.png', 1.0)
   im_list=[im1, im2]
   out=a7.linear_blending(im_list, 0) 
-  io.imwrite(out, 'linear_blending.png', 1.0)
+  io.imwrite(out, 'output/linear_blending.png', 1.0)
 
 def test_linear_blending2():
   im1=io.imread('pano/guedelon-1.png', 1.0)
@@ -79,14 +79,14 @@ def test_linear_blending2():
   im4=io.imread('pano/guedelon-4.png', 1.0)
   im_list=[im1, im2, im3, im4]
   out=a7.linear_blending(im_list, 1) 
-  io.imwrite(out, 'linear_blending2.png', 1.0)
+  io.imwrite(out, 'output/linear_blending2.png', 1.0)
 
 def test_two_scale_blending():
   im1=io.imread('pano/stata-1.png', 1.0)
   im2=io.imread('pano/stata-2.png', 1.0)
   im_list=[im1, im2]
   out=a7.two_scale_blending(im_list, 0) 
-  io.imwrite(out, 'two_scale_blending.png', 1.0)
+  io.imwrite(out, 'output/two_scale_blending.png', 1.0)
 
 def test_two_scale_blending2():
   im1=io.imread('pano/guedelon-1.png', 1.0)
@@ -95,7 +95,7 @@ def test_two_scale_blending2():
   im4=io.imread('pano/guedelon-4.png', 1.0)
   im_list=[im1, im2, im3, im4]
   out=a7.two_scale_blending(im_list, 1) 
-  io.imwrite(out, 'two_scale_blending2.png', 1.0)
+  io.imwrite(out, 'output/two_scale_blending2.png', 1.0)
 
 
 
@@ -164,7 +164,55 @@ def _magic123(im):
   img = img[:, :, np.newaxis]
   img = np.repeat(img, 3, axis=2)
   return img
-  return 
+  return
+
+# My functions
+def test_weight_map():
+  im1=io.imread('pano/castle-1.png', 1.0)
+  im2=io.imread('pano/castle-2.png', 1.0)
+  im3=io.imread('pano/castle-3.png', 1.0)
+  im4=io.imread('pano/castle-4.png', 1.0)
+  im_list=[im1, im2, im3, im4]
+  square=a7.weight_map(750, 750)
+  long=a7.weight_map(750, 350)
+  wide=a7.weight_map(350, 750)
+  io.imwrite(square, 'output/weight_map_squre.png', 1.0)
+  io.imwrite(long, 'output/weight_map_long.png', 1.0)
+  io.imwrite(wide, 'output/weight_map_wide.png', 1.0)
+  
+def castle_autostitch():
+  im1=io.imread('pano/castle-1.png', 1.0)
+  im2=io.imread('pano/castle-2.png', 1.0)
+  im3=io.imread('pano/castle-3.png', 1.0)
+  im4=io.imread('pano/castle-4.png', 1.0)
+  im_list=[im1, im2, im3, im4]
+  out=a7.autostitch(im_list, 1) 
+  io.imwrite(out, 'output/castle_panorama.png', 1.0)
+
+def castle_linear_blending():
+  im1=io.imread('pano/castle-1.png', 1.0)
+  im2=io.imread('pano/castle-2.png', 1.0)
+  im3=io.imread('pano/castle-3.png', 1.0)
+  im4=io.imread('pano/castle-4.png', 1.0)
+  im_list=[im1, im2, im3, im4]
+  out=a7.linear_blending(im_list, 1) 
+  io.imwrite(out, 'output/castle_linear_blending.png', 1.0)
+
+def castle_two_scale_blending2():
+  im1=io.imread('pano/castle-1.png', 1.0)
+  im2=io.imread('pano/castle-2.png', 1.0)
+  im3=io.imread('pano/castle-3.png', 1.0)
+  im4=io.imread('pano/castle-4.png', 1.0)
+  im_list=[im1, im2, im3, im4]
+  out=a7.two_scale_blending(im_list, 1) 
+  io.imwrite(out, 'output/castle_two_blending.png', 1.0)
+
+def lucien_two_scale_blending2():
+  im1=io.imread('pano/lucien_1.png', 1.0)
+  im2=io.imread('pano/lucien_2.png', 1.0)
+  im_list=[im1, im2]
+  out=a7.two_scale_blending(im_list, 1) 
+  io.imwrite(out, 'output/lucien_two_blending.png', 1.0)  
 
 #===Tests=====
 
@@ -174,11 +222,17 @@ def _magic123(im):
 ##test_computeFeatures()
 ##test_findCorrespondence()
 ##test_RANSAC()
-test_autostitch()
-test_autostitch2()
+##test_autostitch()
+##test_autostitch2()
 ##test_linear_blending()
 ##test_linear_blending2()
 ##test_two_scale_blending()
 ##test_two_scale_blending2()
+##test_weight_map()  
+##castle_autostitch()
+##castle_linear_blending()
+##castle_two_scale_blending2()
+lucien_two_scale_blending2()
+
 
   
